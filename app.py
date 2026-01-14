@@ -81,6 +81,7 @@ def render_person_selector(person_number, is_me=False):
     # Handle pending selection changes (set before widget creation)
     pending_key = f"person{person_number}_pending_selection"
     selection_key = f"person{person_number}_selection"
+    last_selection_key = f"person{person_number}_last_selection"
     
     if pending_key in st.session_state:
         st.session_state[selection_key] = st.session_state[pending_key]
@@ -102,6 +103,18 @@ def render_person_selector(person_number, is_me=False):
         options=options,
         key=selection_key
     )
+    
+    # Check if selection changed - if so, clear the strength session state
+    if last_selection_key in st.session_state:
+        if st.session_state[last_selection_key] != selected:
+            # Selection changed - clear strength values
+            for i in range(5):
+                strength_key = f"person{person_number}_strength_{i}"
+                if strength_key in st.session_state:
+                    del st.session_state[strength_key]
+    
+    # Update last selection
+    st.session_state[last_selection_key] = selected
     
     # Initialize variables
     person_name = ""
